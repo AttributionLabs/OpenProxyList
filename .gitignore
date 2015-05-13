@@ -41,3 +41,13 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+*.dll
+bin/Debug/Twilio.Api.xml
+*.pdb
+bin/Debug/HtmlAgilityPack.xml
+bin/Debug/Ionic.Zip.xml
+*.xml
+*.exe
+obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+obj/
+bin/
