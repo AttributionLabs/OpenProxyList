@@ -1,34 +1,51 @@
-﻿using com.kaizengineering.Library.Utils;
+﻿using CoarUtils.commands.logging;
+using OpenProxyList.commands.proxies.theproxisright;
 using System;
+using System.Net;
 
 namespace OpenProxyList {
   class Program {
     static void Main(string[] args) {
       try {
-        AutoRefreshedList.THE_PROX_IS_RIGHT_API_KEY = "YOUR_KEY_HERE -- Free at https://theproxisright.com/#subscribeApi";
-        
+        GetProxyListFromAutoRefreshCache.Execute(
+          hsc: out HttpStatusCode hsc,
+          status: out string status,
+           m: new GetProxyListFromAutoRefreshCache.request {
+             theProxIsRightApiKey = "YOUR_KEY_HERE -- Free at https://theproxisright.com/#subscribeApi",
+           },
+           ct: null,
+           r: out GetProxyListFromAutoRefreshCache.response rGetNewProxyList,
+           hc: null
+        );
+        if (hsc != HttpStatusCode.OK) {
+          hsc = HttpStatusCode.BadRequest;
+          status = "unable to GetNewProxyList";
+          return;
+        }
+
         //what is my ip example:
-        var html = HttpGetViaProxy.GetWithRetries( 
-          baseUrl: "http://webapi.theproxisright.com/", 
+        var html = HttpGetViaProxy.ExecuteWithRetries(
+          baseUrl: "http://webapi.theproxisright.com/",
           resource: "api/ip",
           tryFirstWithoutProxy: false,
+          lowp: rGetNewProxyList.lowp,
           maxAttempts: 10
         );
-        LogIt.LogInfo(html);
+        LogIt.I(html);
 
         //amazon scraping example
-        html = HttpGetViaProxy.GetWithRetries(
+        html = HttpGetViaProxy.ExecuteWithRetries(
           baseUrl: "http://www.amazon.com/",
-          resource: "Capresso-560-01-Infinity-Grinder-Black/dp/B0000AR7SY", 
+          resource: "Capresso-560-01-Infinity-Grinder-Black/dp/B0000AR7SY",
           tryFirstWithoutProxy: false,
+          lowp: rGetNewProxyList.lowp,
           maxAttempts: 10
         );
-        LogIt.LogInfo(html);
+        LogIt.I(html);
       } catch (Exception ex) {
-        LogIt.Log(ex);
+        LogIt.E(ex);
       } finally {
-        LogIt.Log("done.", Severity.Info);
-        LogIt.FlushToFile();
+        LogIt.I("done.");
       }
     }
   }
